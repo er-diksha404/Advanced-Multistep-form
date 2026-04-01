@@ -94,6 +94,7 @@ const MultiStepForm = () => {
         allFields.forEach((field) => {
             const error = validate(field, formData[field], formData);
             if (error) newErrors[field] = error;
+
         });
 
         setErrors(newErrors);
@@ -160,12 +161,12 @@ const MultiStepForm = () => {
             }
         }
 
-        // ✅ FIXED vegType logic (with meal dependency)
-        if (name === "vegType") {
-            if (data?.meal === "veg" && !value) {
-            error = "Veg type is required";
-            }
-        }
+        // // ✅ FIXED vegType logic (with meal dependency)
+        // if (name === "vegType") {
+        //     if (data?.meal === "veg" && !value) {
+        //     error = "Veg type is required";
+        //     }
+        // }
 
         return error;
     };
@@ -180,8 +181,14 @@ const MultiStepForm = () => {
     const handleNext = () => {
         let newErrors = {};
 
-        const fieldsToValidate = stepFields[step];
+        const fieldsToValidate = [...stepFields[step]];
 
+        //   // ✅ Add conditional validation
+        // if (step === 2 && formData.meal === "veg") {
+        //     if (!fieldsToValidate.includes("vegType")) {
+        //         fieldsToValidate.push("vegType");
+        //     }
+        // }
 
         fieldsToValidate.forEach((field) => {
             const error = validate(field, formData[field], formData);

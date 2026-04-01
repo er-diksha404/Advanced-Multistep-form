@@ -1,7 +1,6 @@
 import SelectField from "../common/SelectField";
 
 const StepTwo = ({ formData, errors, handleChange, handleNext, handleBack, setFormData }) => {
-   
   return (
     <div>
       <h2 className="text-lg font-semibold mb-4">Step 2: Preferences</h2>

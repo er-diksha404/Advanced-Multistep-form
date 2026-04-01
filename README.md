@@ -47,5 +47,3 @@ This project demonstrates real-world form handling with dynamic validation and r
 ```bash
 npm install
 npm run dev
-
-
