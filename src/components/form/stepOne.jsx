@@ -3,7 +3,9 @@ import InputField from "../common/InputField"
 const StepOne = ({formData, errors, handleChange, handleNext}) => {
     return (
         <div className="mb-3">
-                <h2 className="text-lg font-semibold mb-4">Step 1: Personal Details</h2>
+                <h2 className="text-lg font-semibold mb-4">
+                    Step 1: Personal Details
+                </h2>
                
                {/* Use reusable InputField component instead of input field to make the code more clean */}
                <InputField

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useEffect } from "react";
 import StepOne from "../components/form/stepOne"
 import StepTwo from "../components/form/stepTwo"
 import StepThree from "../components/form/stepThree"
@@ -13,8 +14,13 @@ const MultiStepForm = () => {
     const [apiResponse, setApiResponse] = useState(null);
     const [apiError, setApiError] = useState("");
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
 
-    const [step, setStep] = useState(1)                                 //For storing the page navigation number
+   // const [step, setStep] = useState(1)                                 //For storing the page navigation number
+    const [step, setStep] = useState(() => {
+    const savedStep = localStorage.getItem("formStep");
+    return savedStep ? Number(savedStep) : 1;
+    });
     const stepFields = {                                                //Fields to validate at each step
         1: ["fullName", "email", "address", "phone", "age"],
         2: ["meal", "seat", "baggage"]
@@ -60,7 +66,7 @@ const MultiStepForm = () => {
                     data
                 }
 
-                setApiResponse(response)
+                setShowSuccess(true)
 
                 // ✅ RESET FORM AFTER SUCCESS
                 setTimeout(() => {
@@ -205,176 +211,123 @@ const MultiStepForm = () => {
         }
     };
 
-    const initialState = {
-        fullName: "",
-        email: "",
-        address: "",
-        phone: "",
-        age: "",
-        meal: "",
-        seat: "",
-        baggage: "",
-        vegType: "",
-        infant: false 
-    }                                                                                       //for controlled values in formData
-
-    const {formData,setFormData,errors,setErrors,handleChange, resetForm} = useForm(initialState, validate);           //useForm custom hook
-
-    return  <div  style={{ maxWidth: "500px", margin: "auto" }}> 
-        <h2 className="text-xl font-bold mb-4 text-center">
-            Advanced Form System
-        </h2>
-
-        <div className="flex justify-between mb-4">
-        {[1, 2, 3].map((s) => (
-            <div
-            key={s}
-            className={`w-8 h-8 flex items-center justify-center rounded-full 
-                ${step === s ? "bg-blue-500 text-white" : "bg-gray-300"}`}
-            >
-            {s}
-            </div>
-        ))}
-        </div>
-        {/* //Props passing in reusable components with conditional rendering */}
-          {step === 1 && (
-            <StepOne 
-                formData={formData}
-                errors={errors}
-                handleChange={handleChange}
-                handleNext={handleNext}
-            />
-        )}
+    const getInitialState = () => {
+    const savedData = localStorage.getItem("formData");
+    return savedData
+        ? JSON.parse(savedData)
+        : {
+            fullName: "",
+            email: "",
+            address: "",
+            phone: "",
+            age: "",
+            meal: "",
+            seat: "",
+            baggage: "",
+            vegType: "",
+            infant: false,
+        };
+    };
         
-         {step === 2 && (
-            <StepTwo 
-                formData={formData}
-                errors={errors}
-                handleChange={handleChange}
-                handleNext={handleNext}
-                handleBack={handleBack}
-                setFormData = {setFormData}
-            />
-        )}
-        
+    const {formData,setFormData,errors,setErrors,handleChange, resetForm} = useForm(getInitialState, validate);           //useForm custom hook
 
-         {step === 3 && (
-            <StepThree
-                formData={formData}
-                handleBack={handleBack}
-                handleSubmit={handleSubmit}
-                loading={loading}
-                apiResponse={apiResponse}
-                apiError={apiError}
-                isSubmitted = {isSubmitted}
-            />
-        )}
-    
-        {/* //all page renderings handling from Main mulitform page here */}
-        {/* {step === 1 && (
-            <>
-                <h2>Step 1: Personal Details</h2>
-               
-            <input 
-                name = "fullName" 
-                placeholder="Full Name" 
-                value={formData.fullName} 
-                onChange={handleChange} 
-            />
-            {errors.fullName && <p style={{color: 'red'}}> {errors.fullName} </p>}
-            <br></br>
+    useEffect(() => {
+    localStorage.setItem("formData", JSON.stringify(formData));
+    }, [formData]);
 
-            <input
-                name="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleChange}
-            />
-            {errors.email && <p style={{color:'red'}}>{errors.email}</p>}
-            <br></br>
+    useEffect(() => {
+    localStorage.setItem("formStep", step);
+    }, [step]);
 
-           <textarea
-                name="address"
-                placeholder="Enter your full address"
-                value={formData.address}
-                onChange={handleChange}
-            />
-            {errors.address && <p style={{color: 'red'}}>{errors.address}</p>}
-            <br></br>
+    return (
+        <div style={{ maxWidth: "500px", margin: "auto" }}>
+            
+            {showSuccess ? (
+            <div className="text-center">
+                <h2 className="text-2xl font-bold text-green-600 mb-4">
+                ✅ Form Submitted Successfully!
+                </h2>
+                <p className="text-gray-600 mb-6">
+                Thank you for your submission.
+                </p>
 
-            <input
-                type="tel"                                  //keyboard only show digits
-                name="phone"
-                maxLength={10}                              //this will allow only 10 digit on ui
-                placeholder="Phone"
-                value={formData.phone}
-                onChange={handleChange}
-            />
-            {errors.phone && <p style={{color : 'red'}}>{errors.phone}</p>}
-            <br></br>
-
-            <input
-                type="number"
-                name="age"
-                min="18"
-                max="110"
-                placeholder="Age"
-                value={formData.age}
-                onChange={handleChange}
-            />
-            {errors.age && <p style={{color: 'red'}}>{errors.age}</p>}
-            <br></br>
-
-            <button type="button" onClick={handleNext}>Next</button>
-       
-            </>
-        )}
-        
-         {step === 2 && (
-            <>
-                <h2>Step 2: Preferences</h2>
-
-                <select name="meal" onChange={handleChange}>
-                <option value="">Select Meal</option>
-                <option value="veg">Veg</option>
-                <option value="nonveg">Non-Veg</option>
-                </select>
-
-                <select name="seat" onChange={handleChange}>
-                <option value="">Select Seat</option>
-                <option value="window">Window</option>
-                <option value="aisle">Aisle</option>
-                </select>
-
-                <select name="baggage" onChange={handleChange}>
-                <option value="">Select Baggage</option>
-                <option value="15kg">15kg</option>
-                <option value="20kg">20kg</option>
-                </select>
-
-                <br /><br />
-
-                <button onClick={handleBack}>Back</button>
-                <button onClick={handleNext}>Next</button>
-            </>
-        )}
-        
-
-         {step === 3 && (
-            <>
-                <h2>Step 3: Review</h2>
-
-                <pre>{JSON.stringify(formData, null, 2)}</pre>
-
-                <button onClick={handleBack}>Back</button>
-                <button onClick={() => alert("Submit API here")}>
-                Submit
+                <button
+                onClick={() => {
+                    resetForm();
+                    localStorage.removeItem("formData")
+                    localStorage.removeItem("formStep")
+                    setStep(1);
+                    setShowSuccess(false);
+                }}
+                className="bg-blue-500 text-white px-5 py-2 rounded-lg hover:bg-blue-600"
+                >
+                Fill Again
                 </button>
+            </div>
+            ) : (
+            <>
+                <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
+                    Multi-Step Booking Form
+                </h2>
+
+                {/* Progress Bar */}
+                <div className="flex items-center justify-between mb-6">
+                {[1, 2, 3].map((s, index) => (
+                    <div key={s} className="flex items-center w-full">
+                    <div
+                        className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium 
+                        ${step >= s ? "bg-blue-500 text-white" : "bg-gray-300 text-gray-600"}`}
+                    >
+                        {s}
+                    </div>
+
+                    {index < 2 && (
+                        <div
+                        className={`flex-1 h-1 mx-2 
+                        ${step > s ? "bg-blue-500" : "bg-gray-300"}`}
+                        />
+                    )}
+                    </div>
+                ))}
+                </div>
+
+                {/* Steps */}
+                {step === 1 && (
+                <StepOne
+                    formData={formData}
+                    errors={errors}
+                    handleChange={handleChange}
+                    handleNext={handleNext}
+                />
+                )}
+
+                {step === 2 && (
+                <StepTwo
+                    formData={formData}
+                    errors={errors}
+                    handleChange={handleChange}
+                    handleNext={handleNext}
+                    handleBack={handleBack}
+                    setFormData={setFormData}
+                />
+                )}
+
+                {step === 3 && (
+                <StepThree
+                    formData={formData}
+                    handleBack={handleBack}
+                    handleSubmit={handleSubmit}
+                    loading={loading}
+                    apiResponse={apiResponse}
+                    apiError={apiError}
+                    isSubmitted={isSubmitted}
+                />
+                )}
             </>
-        )} */}
-      
-    </div>
-}
+            )}
+        </div>
+    );
+    }
 
 //Uncontrolled component
 // const MultiStepForm = () =>{

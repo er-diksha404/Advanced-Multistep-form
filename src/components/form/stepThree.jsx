@@ -5,7 +5,7 @@ const StepThree = ({formData, handleBack, handleSubmit, loading, apiResponse, ap
      
     return(
         <div className="relative">
-                <h2>Step 3: Review</h2>
+                <h2 className="text-lg font-semibold mb-4">Step 3: Review & Confirm</h2>
 
                 <div className="bg-gray-50 p-4 rounded-lg space-y-3">
 

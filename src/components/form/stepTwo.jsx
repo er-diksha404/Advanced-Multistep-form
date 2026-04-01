@@ -3,7 +3,7 @@ import SelectField from "../common/SelectField";
 const StepTwo = ({ formData, errors, handleChange, handleNext, handleBack, setFormData }) => {
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-4">Step 2: Preferences</h2>
+      <h2 className="text-lg font-semibold mb-4">Step 2: Travel Preferences</h2>
 
     {/* suing reusable component SelectFiled instead of select tag for clean and scalable code */}
     <div  className="mb-4">
@@ -36,13 +36,14 @@ const StepTwo = ({ formData, errors, handleChange, handleNext, handleBack, setFo
       <div className="mb-4">
          <SelectField
             label="Veg Type"
+            value={formData.vegType}
             name="vegType"
             onChange={handleChange}
             options={[
                 {label: "Jain", value: "jain"},
                 {label: "Vegan", value: "vegan"}
             ]}
-             error={errors.meal}
+             error={errors.vegType}
         />
       </div>
       }
